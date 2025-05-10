@@ -32,6 +32,7 @@ import com.replik.peksansevkiyat.DataClass.ModelDto.Order.OrderDtos;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Order.OrderShipment;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.OrderShipping;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.OrderShippingList;
+import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.UpdateShipmentVehicleStatusDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Result;
 import com.replik.peksansevkiyat.Interface.APIClient;
 import com.replik.peksansevkiyat.Interface.APIInterface;
@@ -271,22 +272,41 @@ public class ShipmentOrderFinish extends AppCompatActivity implements ListenerIn
                             if (response.body().getSuccess()) {
 
                                 nDialog.show();
-                                apiPdfInterface.generatePdf(order.getSevkNo())
+                                apiPdfInterface.generatePdf(order.getSevkNo(), GlobalVariable.getUserCode())
                                         .enqueue(
                                                 new Callback<Result>() {
                                                     @Override
                                                     public void onResponse(@NonNull Call<Result> call, @NonNull Response<Result> r) {
-                                                        nDialog.dismiss();
+                                                        apiInterface.updateVehicleStatus(GlobalVariable.getShipmentVehicleStatus())
+                                                                .enqueue(
+                                                                        new Callback<Result>() {
+                                                                            @Override
+                                                                            public void onResponse(Call<Result> call, Response<Result> _) {
+                                                                                nDialog.hide();
 
-                                                        Toast.makeText(context, getString(R.string.success), Toast.LENGTH_LONG).show();
+                                                                                Toast.makeText(context, getString(R.string.success), Toast.LENGTH_LONG).show();
 
-                                                        printLabel(response.body().getData(), order.getSevkNo());
+                                                                                GlobalVariable.setShipmentVehicleStatus(null);
+                                                                                printLabel(response.body().getData(), order.getSevkNo());
 
-                                                        Intent i = new Intent(context, MenuActivity.class);
-                                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                        startActivity(i);
+                                                                                Intent i = new Intent(context, MenuActivity.class);
+                                                                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                                startActivity(i);
 
-                                                        finish();
+                                                                                finish();
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onFailure(Call<Result> call, Throwable t) {
+                                                                                nDialog.hide();
+
+                                                                                alert = Alert.getAlert(context, getString(R.string.error), t.getMessage());
+                                                                                alert.show();
+                                                                            }
+                                                                        }
+                                                                );
+
+
                                                     }
 
                                                     @Override

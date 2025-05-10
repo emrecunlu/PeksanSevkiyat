@@ -109,6 +109,28 @@
                     app:strokeColor="@color/button_border"
                     app:strokeWidth="@dimen/one" />
 
+                <Button
+                    android:id="@+id/btnRawMaterial"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/seventy"
+                    android:layout_marginTop="@dimen/ten"
+                    android:text="@string/menu_raw_material"
+                    app:cornerRadius="@dimen/fifteen"
+                    app:strokeColor="@color/button_border"
+                    app:strokeWidth="@dimen/one" />
+
+                <Button
+                    android:id="@+id/btnEnumeration"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/seventy"
+                    android:layout_marginTop="@dimen/ten"
+                    android:text="@string/menu_enumeration"
+                    app:cornerRadius="@dimen/fifteen"
+                    app:strokeColor="@color/button_border"
+                    app:strokeWidth="@dimen/one" />
+
+
+
             </LinearLayout>
 
         </ScrollView>

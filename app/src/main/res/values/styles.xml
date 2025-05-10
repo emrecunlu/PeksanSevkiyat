@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DarkAutoCompleteStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxBackgroundColor">@color/fragment_bg</item>
+        <item name="boxStrokeColor">@color/text_input_box_stroke</item>
+        <item name="android:textColorHint">@color/white_light</item>
+        <item name="hintTextColor">@color/white_light</item>
+        <item name="endIconTint">@color/white_light</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="android:dropDownHeight">250dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/white_light</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="hintEnabled">true</item>
+        <item name="android:textColorHighlight">@color/white</item>
+    </style>
+
+    <style name="DropDownItemStyle" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@color/white_light</item>
+        <item name="android:background">@color/fragment_bg</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="EmptyDropdownStyle">
+        <item name="android:textColor">@color/white_light</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">@color/fragment_bg</item>
+    </style>
+</resources> 

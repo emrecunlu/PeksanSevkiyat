@@ -14,11 +14,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.dcastalia.localappupdate.DownloadApk;
-import com.google.firebase.appcheck.interop.BuildConfig;
 import com.replik.peksansevkiyat.DataClass.ModelDto.ApkVersion;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Personel.Personel;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Personel.PersonelList;
@@ -51,7 +52,6 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     APIInterface apiInterface;
-    ProgressDialog nDialog;
     AlertDialog alert;
 
     Context context = MainActivity.this;
@@ -63,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList personelList;
     PersonelList personels;
     Integer SelectedPersonelId = -1;
+    Integer SelectedPersonCode = -1;
 
     private SQLiteDatabase database;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +75,16 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportFragmentManager();
 
-        if (!checkPermission())
-            requestPer();
+        progressBar = findViewById(R.id.progressBar);
+
+        if (!checkPermission()) requestPer();
+
+        Intent intent = getIntent();
+
+        Log.i("From Notification", intent.getBooleanExtra("fromNotification", false) ? "VAR" : "YOK");
 
         lblVersion = findViewById(R.id.lblVersion);
         lblVersion.setText(GlobalVariable.apiVersion);
-
-        nDialog = Dialog.getDialog(context, getString(R.string.loading));
 
         ddlUser = findViewById(R.id.ddlUser);
 
@@ -131,10 +136,14 @@ public class MainActivity extends AppCompatActivity {
         ddlUser.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (i != 0)
+                if (i != 0) {
                     SelectedPersonelId = personels.getPersonels().get(i - 1).getId();
-                else
+                    SelectedPersonCode = Integer.valueOf(personels.getPersonels().get(i - 1).getStaffCode());
+                } else {
                     SelectedPersonelId = -1;
+                    SelectedPersonCode = -1;
+                }
+
             }
 
             @Override
@@ -147,12 +156,29 @@ public class MainActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (SelectedPersonelId != -1) {
-                    Intent i = new Intent(context, MenuActivity.class);
                     String userName = ddlUser.getSelectedItem().toString();
                     GlobalVariable.setUserName(userName);
                     GlobalVariable.setUserId(SelectedPersonelId);
-                    //i.putExtra("userName", userName);
-                    startActivity(i);
+                    GlobalVariable.setUserCode(SelectedPersonCode);
+
+                    if (getIntent().getBooleanExtra("fromNotification", false)) {
+                        // Önce MenuActivity'yi başlat
+                        Intent menuIntent = new Intent(context, MenuActivity.class);
+                        menuIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(menuIntent);
+
+                        // Sonra RawMaterialsActivity'yi başlat
+                        Intent rawMaterialIntent = new Intent(context, RawMaterialsActivity.class);
+                        rawMaterialIntent.putExtra("notificationRawMaterials", getIntent().getSerializableExtra("notificationRawMaterials"));
+                        rawMaterialIntent.putExtra("fromNotification", true);
+                        startActivity(rawMaterialIntent);
+
+                        // MainActivity'yi kapat
+                        finish();
+                    } else {
+                        Intent i = new Intent(context, MenuActivity.class);
+                        startActivity(i);
+                    }
                 } else {
                     Toast.makeText(context, getString(R.string.please_select_user), Toast.LENGTH_LONG).show();
                 }
@@ -162,11 +188,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fnVersionControl() {
-        nDialog.show();
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        
         apiInterface.getApkVersion().enqueue(new Callback<ApkVersion>() {
             @Override
             public void onResponse(Call<ApkVersion> call, Response<ApkVersion> response) {
-                nDialog.hide();
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+                
                 if (response.isSuccessful()) {
                     if (!response.body().getVersion().equals(GlobalVariable.apiVersion)) {
                         fnNewVersionDownload(response.body().getUrl(), response.body().getDetail());
@@ -176,10 +208,12 @@ public class MainActivity extends AppCompatActivity {
                     alert.show();
                 }
             }
-
+            
             @Override
             public void onFailure(Call<ApkVersion> call, Throwable t) {
-                nDialog.hide();
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
             }
         });
     }
@@ -191,13 +225,13 @@ public class MainActivity extends AppCompatActivity {
         builder.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                nDialog.dismiss();
+                //nDialog.dismiss();
             }
         });
         builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                nDialog.hide();
+                //nDialog.hide();
                 DownloadApk downloadApk = new DownloadApk(context);
                 downloadApk.startDownloadingApk(url, "update");
             }
@@ -206,30 +240,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     boolean checkPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) +
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.REQUEST_INSTALL_PACKAGES) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) + ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) + ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) + ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) + ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) + ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) + ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) + ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) + ActivityCompat.checkSelfPermission(this, Manifest.permission.REQUEST_INSTALL_PACKAGES) == PackageManager.PERMISSION_GRANTED;
     }
 
     void requestPer() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            requestPermissions(new String[]{
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-                    Manifest.permission.INTERNET,
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_ADMIN,
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.REQUEST_INSTALL_PACKAGES
-            }, 200);
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH, Manifest.permission.REQUEST_INSTALL_PACKAGES}, 200);
 /*
         int permissionExternalMemory = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permissionExternalMemory != PackageManager.PERMISSION_GRANTED)
@@ -251,11 +267,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getPersonelList() {
-        nDialog.show();
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        
         apiInterface.getUserList().enqueue(new Callback<PersonelList>() {
             @Override
             public void onResponse(Call<PersonelList> call, Response<PersonelList> response) {
-                nDialog.hide();
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+                
                 if (response != null) {
                     if (response.body().getSuccess()) {
                         personels = response.body();
@@ -269,7 +291,6 @@ public class MainActivity extends AppCompatActivity {
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         ddlUser.setAdapter(adapter);
                     } else {
-                        nDialog.hide();
                         alert = Alert.getAlert(context, getString(R.string.error), response.body().getMessage());
                         alert.show();
                     }
@@ -278,7 +299,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<PersonelList> call, Throwable t) {
-                nDialog.hide();
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+                
                 alert = Alert.getAlert(context, getString(R.string.error), t.getMessage());
                 alert.show();
             }
@@ -364,8 +388,7 @@ public class MainActivity extends AppCompatActivity {
             int printerNameNoIndex = cursor.getColumnIndex("printerName");
 
             while (cursor.moveToNext())
-                if (cursor.getString(apiUrlIndex).toString().equals(""))
-                    return false;
+                if (cursor.getString(apiUrlIndex).toString().equals("")) return false;
             return true;
         } else {
             database.execSQL("INSERT INTO Parameter (id, apiUrl, printerName) VALUES(1, '', '')");

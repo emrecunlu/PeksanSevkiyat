@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/replik"
+    tools:context=".OrderFinishActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sixty"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imgLogo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:backgroundTint="@color/replik"
+                android:contentDescription="@string/app_name"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/replik_logo" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ten"
+                    android:text="@string/test_user"
+                    android:textColor="@color/white_light" />
+
+                <TextView
+                    android:id="@+id/txtMenuName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/menu_enumeration"
+                    android:textColor="@color/white_light" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/fragment_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/forty"
+                android:layout_marginTop="@dimen/thirty"
+                android:layout_marginRight="@dimen/forty"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btnRawMaterialCounting"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/seventy"
+                    android:text="@string/menu_raw_material_counting"
+                    app:cornerRadius="@dimen/fifteen"
+                    app:strokeColor="@color/button_border"
+                    app:strokeWidth="@dimen/one" />
+
+                <Button
+                    android:id="@+id/btnConsumableCounting"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/seventy"
+                    android:layout_marginTop="@dimen/ten"
+                    android:text="@string/menu_consumable_counting"
+                    app:cornerRadius="@dimen/fifteen"
+                    app:strokeColor="@color/button_border"
+                    app:strokeWidth="@dimen/one" />
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,4 +11,7 @@
     <color name="fragment_bg">#2D3340</color>
     <color name="btn_green">#1D512B</color>
     <color name="btn_red">#571617</color>
+    <color name="muted">#1f2937</color>
+    <color name="disabled">#CCCCCC</color>
+    <color name="success">#4CAF50</color>
 </resources>

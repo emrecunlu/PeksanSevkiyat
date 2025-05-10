@@ -11,5 +11,5 @@ import retrofit2.http.Query;
 public interface ApiPdfInterface {
     @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
     @GET("api/Generate/Yukleme")
-    Call<Result> generatePdf(@Query("sevkNo") String sevkNo);
+    Call<Result> generatePdf(@Query("sevkNo") String sevkNo, @Query("staffId") int staffId);
 }

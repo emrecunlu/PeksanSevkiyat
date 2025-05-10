@@ -45,7 +45,7 @@ public class SettingsActivity extends AppCompatActivity implements Interfaces.Bl
         setContentView(R.layout.activity_settings);
 
         txtApiUrl = findViewById(R.id.txtApiUrl);
-        txtApiUrl.setText(GlobalVariable.getApiUrl() == null ? "http://192.168.2.251:7076/" : GlobalVariable.getApiUrl());
+        txtApiUrl.setText(GlobalVariable.getApiUrl() == null ? "http://192.168.2.251:3131/" : GlobalVariable.getApiUrl());
         txtPrinterName = findViewById(R.id.txtPrinterName);
         txtPrinterName.setText(GlobalVariable.printerName);
 

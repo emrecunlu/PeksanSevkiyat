@@ -13,14 +13,13 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.replik.peksansevkiyat.DataClass.ListAdapter.ListenerInterface;
-import com.replik.peksansevkiyat.DataClass.ModelDto.Order.Order;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.OrderShippingTransport;
 import com.replik.peksansevkiyat.Interface.APIClient;
 import com.replik.peksansevkiyat.Interface.APIInterface;
-import com.replik.peksansevkiyat.Transection.Alert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +51,7 @@ public class UpdateTransportDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.update_transport_dialog, null);
+
         apiInterface = APIClient.getRetrofit().create(APIInterface.class);
 
         autoCompleteTextView = (MaterialAutoCompleteTextView) view.findViewById(R.id.autoComplete_transport);
@@ -63,17 +63,20 @@ public class UpdateTransportDialogFragment extends DialogFragment {
         builder.
                 setView(view)
                 .setTitle("Nakliye Tipi")
+                .setNeutralButton(getString(R.string.vehicle_control), (dialog, which) -> {
+                    listener.onVehicleStatusOpen();
+                })
                 .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     listener.onTransportSelected(selectedTransport);
-                    dismiss();
+                    dialog.dismiss();
                 })
                 .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
-                    dismiss();
+                    dialog.dismiss();
                 });
 
         fetchTransportList();
 
-        return builder.create();
+        return builder.show();
     }
 
     void fetchTransportList() {

@@ -18,6 +18,7 @@ import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.UpdateOrderShi
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.CreatePalletDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.PalletContentDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.PalletContentResponse;
+import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.UpdateShipmentVehicleStatusDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.PalletDetail;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.PalletLabelResponse;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.PalletSingle;
@@ -27,6 +28,10 @@ import com.replik.peksansevkiyat.DataClass.ModelDto.PalletDetail.PalletDetailLis
 import com.replik.peksansevkiyat.DataClass.ModelDto.Personel.PersonelList;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Result;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Seritra.spSeritraSingle;
+import com.replik.peksansevkiyat.DataClass.ModelDto.Stock.LotItem;
+import com.replik.peksansevkiyat.DataClass.ModelDto.Stock.StockItem;
+import com.replik.peksansevkiyat.DataClass.ModelDto.Stock.StockLot;
+import com.replik.peksansevkiyat.DataClass.ModelDto.Transfer.TransferRequest;
 
 import java.util.List;
 
@@ -169,4 +174,30 @@ public interface APIInterface {
     @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
     @POST("api/Pallet/CreatePallet")
     Call<PalletLabelResponse> PalletCreate(@Body CreatePalletDto createPalletDto);
+    @POST("api/Shipment/VehicleControl")
+    Call<Result> updateVehicleStatus(@Body UpdateShipmentVehicleStatusDto updateShipmentVehicleStatusDto);
+
+    @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
+    @GET("api/MaterialTransfer/AllStocks")
+    Call<List<StockItem>> getStockList();
+
+    @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
+    @GET("api/MaterialTransfer/RequestStocks")
+    Call<List<StockItem>> getRequstedStockList();
+
+    @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
+    @GET("api/MaterialTransfer/StockMovements/{stockCode}")
+    Call<List<StockLot>> getStockLotList(@Path("stockCode") String stockCode, @Query("search") String search);
+
+    @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
+    @GET("api/MaterialTransfer/StockMovements/{stockCode}")
+    Call<List<LotItem>> getLotList(
+        @Path("stockCode") String stockCode,
+        @Query("search") String search
+    );
+
+    @Headers({"CONNECT_TIMEOUT:60000", "READ_TIMEOUT:60000", "WRITE_TIMEOUT:60000"})
+    @POST("api/MaterialTransfer/TransferMaterial")
+    Call<Result> transferMaterial(@Body List<TransferRequest> request);
 }
+

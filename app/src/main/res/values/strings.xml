@@ -21,6 +21,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu">İŞLEMLER</string>
+    <string name="menu_raw_material">HAMMADDE İŞLEMLERİ</string>
+    <string name="menu_stock_list">STOK LİSTESİ</string>
     <string name="menu_palette">PALET İŞLEMLERİ</string>
     <string name="menu_palette_add">PALET OLUŞTUR / DÜZENLE</string>
     <string name="menu_palette_edit">PALET SİL / DÜZENLE</string>
@@ -29,6 +31,9 @@
     <string name="menu_order_send">SİPARİŞ SEVK</string>
     <string name="menu_shipment">SEVK İŞLEMLERİ</string>
     <string name="menu_settings">AYARLAR</string>
+    <string name="menu_enumeration">SAYIM İŞLEMLERİ</string>
+    <string name="menu_raw_material_counting">HAMMADDE SAYIMI</string>
+    <string name="menu_consumable_counting">SARF SAYIMI</string>
     <string name="palette_add">PALET OLUŞTUR</string>
     <string name="palette_edit">PALET DÜZENLE</string>
     <string name="customer_list">CARİ LİSTESİ</string>
@@ -57,9 +62,11 @@
     <string name="error_products_do_not_match">Ürünler Uyuşmuyor!</string>
     <string name="error_palette_used">Bu Seri Zaten Girilmiş!</string>
     <string name="error_wrong_pallet">Seri Başka Palette Tanımlı</string>
+    <string name="error_consumable_counting">Sayım Esnasında Hata Oluştu!</string>
     <string name="no">HAYIR</string>
     <string name="yes">EVET</string>
     <string name="sure">Emin Misiniz?</string>
+    <string name="question_is_product">Ürün Mü?</string>
     <string name="question_pallet_detail_delete">Seri Paletten Silinecek</string>
     <string name="question_pallet_delete">Palet Tamamen Silinecek</string>
     <string name="question_pallet_detail_add">Seri Palete Eklenecek</string>
@@ -99,9 +106,20 @@
     <string name="order_sofor_dorse">DORSE PLAKA</string>
     <string name="order_sofor_dorse2">DORSE PLAKA 2</string>
     <string name="add_order_shipping">TESLİMAT BİLGİSİ EKLE</string>
+    <string name="add_new_item">Yeni Ekle</string>
     <string name="server_address">Api Adresi</string>
     <string name="printer_name">Yazıcı</string>
     <string name="not_empty">Boş Geçilemez!</string>
+    <string name="vehicle_control">ARAÇ KONTROL</string>
+    <string name="add">EKLE</string>
+    <string name="check_vehicle_control">Lütfen araç kontrollerini tamamlayınız.</string>
+
+    <string name="next">Next</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet...</string>
+    <string name="previous">Previous</string>
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="warning">Uyarı</string>
 
     <string-array name="planets_array">
         <item>MERCURY</item>

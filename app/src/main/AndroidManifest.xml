@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.replik.peksansevkiyat">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -14,6 +15,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".ApplicationClass"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,6 +26,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TestAPP"
         tools:targetApi="31">
+        <activity
+            android:name=".RecountingMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RawMaterialStockListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RawMaterialsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RawMaterialLotTransferActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RawMaterialLotTransfer"
+            android:exported="false"
+            android:theme="@style/Theme.TestAPP" />
+        <activity
+            android:name=".RawMaterial"
+            android:exported="false" />
+        <activity
+            android:name=".RawMaterialMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EnumerationActivity"
+            android:exported="false" />
         <activity
             android:name=".ShipmentOrderFinish"
             android:exported="false" />
@@ -81,6 +109,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".LotListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ConsumableCountingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SelectionListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WarehouseListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".StockListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

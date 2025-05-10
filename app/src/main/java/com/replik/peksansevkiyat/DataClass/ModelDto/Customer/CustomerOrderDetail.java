@@ -13,6 +13,7 @@ public class CustomerOrderDetail implements Serializable {
     private int gonderilenMiktar;
     private String stokAdi;
     private String color;
+    private boolean isDeposit;
 
     public int getId() {
         return id;
@@ -92,5 +93,13 @@ public class CustomerOrderDetail implements Serializable {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public boolean isDeposit() {
+        return isDeposit;
+    }
+
+    public void setDeposit(boolean deposit) {
+        isDeposit = deposit;
     }
 }

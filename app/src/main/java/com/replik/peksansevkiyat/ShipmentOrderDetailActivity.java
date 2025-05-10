@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +32,7 @@ import com.replik.peksansevkiyat.DataClass.ModelDto.Order.OrderDtos;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Order.OrderProduct;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.OrderShippingTransport;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.UpdateOrderShippingTransportDto;
+import com.replik.peksansevkiyat.DataClass.ModelDto.OrderShipping.UpdateShipmentVehicleStatusDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Pallet.PalletDetail;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Result;
 import com.replik.peksansevkiyat.Interface.APIClient;
@@ -48,7 +48,11 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,10 +61,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ShipmentOrderDetailActivity extends AppCompatActivity implements ListenerInterface.UpdateTransportDialogListener {
+public class ShipmentOrderDetailActivity extends AppCompatActivity implements ListenerInterface.UpdateTransportDialogListener, ListenerInterface.UpdateVehicleStatusDialogListener {
     ImageView logoImageView, printImageView;
     Button finishOrderButton;
     EditText barcodeEditText;
+    Map<String, Boolean> vehicleStatus = new HashMap<>();
     PrintBluetooth printBluetooth = new PrintBluetooth();
     ProgressDialog loader;
     AlertDialog alert;
@@ -75,6 +80,13 @@ public class ShipmentOrderDetailActivity extends AppCompatActivity implements Li
     List<CustomerOrderDetail> customerOrderDetailList = new ArrayList<>();
     Customer customer;
     CustomerOrder order;
+
+    public ShipmentOrderDetailActivity() {
+        vehicleStatus.put("hygenie", false);
+        vehicleStatus.put("insect", false);
+        vehicleStatus.put("smell", false);
+        vehicleStatus.put("leakage", false);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,12 +149,25 @@ public class ShipmentOrderDetailActivity extends AppCompatActivity implements Li
         finishOrderButton = (Button) findViewById(R.id.btnFinishOrder);
         finishOrderButton.setVisibility(View.GONE);
         finishOrderButton.setOnClickListener(v -> {
+            if (vehicleStatus.containsValue(false)) {
+                Toast.makeText(context, getString(R.string.check_vehicle_control), Toast.LENGTH_LONG).show();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                new UpdateVehicleStatusDialogFragment(vehicleStatus, ShipmentOrderDetailActivity.this).show(fragmentManager, "UPDATE_VEHICLE_STATUS");
+
+                return;
+            }
+
+
+            UpdateShipmentVehicleStatusDto shipmentVehicleStatusDto =
+                    new UpdateShipmentVehicleStatusDto(order.getSevkNo(), GlobalVariable.getUserCode(), 0, vehicleStatus.getOrDefault("hygenie", false), vehicleStatus.getOrDefault("insect", false), vehicleStatus.getOrDefault("smell", false), vehicleStatus.getOrDefault("leakage", false));
+
+            GlobalVariable.setShipmentVehicleStatus(shipmentVehicleStatusDto);
+            GlobalVariable.setCustomerOrderDetails(customerOrderDetailList);
+
             Intent i = new Intent(this, ShipmentOrderFinish.class);
 
             i.putExtra("customer", customer);
             i.putExtra("order", order);
-
-            GlobalVariable.setCustomerOrderDetails(customerOrderDetailList);
 
             startActivity(i);
         });
@@ -243,10 +268,12 @@ public class ShipmentOrderDetailActivity extends AppCompatActivity implements Li
                                                     orderDetail.get().getSipNo(),
                                                     customer.getCode(),
                                                     GlobalVariable.getUserId(),
+                                                    barcode.toUpperCase().contains("PLT") && orderDetail.get().isDeposit(),
                                                     product.getProducts().stream().map(x -> new OrderProduct(x, product.getStokKod(), product.getYapkod())).collect(Collectors.toList())
                                             );
 
                                     loader.show();
+
                                     apiInterface.createOrderByProducts(orderByProductsDto).enqueue(
                                             new Callback<Result>() {
                                                 @Override
@@ -289,91 +316,6 @@ public class ShipmentOrderDetailActivity extends AppCompatActivity implements Li
                                 }
                             }
 
-
-
-                            /*List<CustomerOrderDetail> list = customerOrderDetailList.stream().filter(x -> x.getSevkMiktar() != x.getGonderilenMiktar()).collect(Collectors.toList());
-
-                            if (response.body().stream().anyMatch(x -> x.getProducts().isEmpty())) {
-                                alert = Alert.getAlert(context, getString(R.string.error), "Hatalı Palet Serisi!");
-
-                                alert.show();
-                                return;
-                            }
-
-                            if (response.body().size() > list.size()) {
-                                alert = Alert.getAlert(context, getString(R.string.error), "Hatalı Palet Serisi!");
-
-                                alert.show();
-                                return;
-                            }
-
-                            boolean hasEquals = true;
-
-                            for (CustomerOrderDetail order : list) {
-                                if (!response.body().stream().allMatch(x -> x.getStokKod().equals(order.getStokKodu()) && x.getYapkod().equals(order.getUrunYapkod()))) {
-                                    hasEquals = false;
-                                    break;
-                                }
-                            }
-
-                            if (!hasEquals) {
-                                alert = Alert.getAlert(context, getString(R.string.error), "Yapı Kodu veya Stok Kodu Uyuşmuyor!");
-
-                                alert.show();
-                                return;
-                            }*/
-
-/*
-                            for (int i = 0; i < response.body().size(); i++) {
-                                final PalletDetail palletDetail = response.body().get(i);
-                                final CustomerOrderDetail customerOrderDetail = list.get(i);
-
-                                final OrderDtos.createOrderByProductsDto orderByProductsDto =
-                                        new OrderDtos.createOrderByProductsDto(
-                                                order.getSevkNo(),
-                                                customerOrderDetail.getSipNo(),
-                                                customer.getCode(),
-                                                GlobalVariable.getUserId(),
-                                                palletDetail.getProducts().stream().map(x -> new OrderProduct(x, palletDetail.getStokKod(), palletDetail.getYapkod())).collect(Collectors.toList())
-                                        );
-
-                                loader.show();
-                                apiInterface.createOrderByProducts(orderByProductsDto).enqueue(
-                                        new Callback<Result>() {
-                                            @Override
-                                            public void onResponse(Call<Result> call, Response<Result> response) {
-                                                loader.dismiss();
-
-                                                if (response.body() != null) {
-                                                    if (response.body().getSuccess()) {
-                                                        fetchOrderDetailList();
-
-                                                        printLabel(new ShippingPrintLabelDto(
-                                                                order.getSevkNo(),
-                                                                order.getTeslimAdi(),
-                                                                order.getTeslimAdresi()
-                                                        ));
-                                                    } else {
-                                                        alert = Alert.getAlert(context, getString(R.string.error), response.body().getMessage());
-                                                        alert.show();
-                                                    }
-                                                } else {
-                                                    alert = Alert.getAlert(context, getString(R.string.error), response.message());
-                                                    alert.show();
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onFailure(Call<Result> call, Throwable t) {
-                                                loader.dismiss();
-
-                                                alert = Alert.getAlert(context, getString(R.string.error), t.getMessage());
-                                                alert.show();
-                                            }
-                                        }
-                                );
-                            }
-*/
                         } else {
                             alert = Alert.getAlert(context, getString(R.string.error), getString(R.string.danger));
                             alert.show();
@@ -433,5 +375,16 @@ public class ShipmentOrderDetailActivity extends AppCompatActivity implements Li
                     }
                 }
         );
+    }
+
+    @Override
+    public void onVehicleStatusOpen() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        new UpdateVehicleStatusDialogFragment(vehicleStatus, this).show(fragmentManager, "UPDATE_VEHICLE_STATUS");
+    }
+
+    @Override
+    public void onSubmit(Map<String, Boolean> status) {
+        this.vehicleStatus = status;
     }
 }

@@ -22,6 +22,7 @@ import com.replik.peksansevkiyat.DataClass.ListAdapter.ListAdapter_OrderDetail;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Order.OrderDtos;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderDetail.OrderDetail;
 import com.replik.peksansevkiyat.DataClass.ModelDto.OrderDetail.OrderDetailList;
+import com.replik.peksansevkiyat.DataClass.ModelDto.OrderDetail.OrderPrintLabelDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Result;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Seritra.spSeritraSingle;
 import com.replik.peksansevkiyat.Interface.APIClient;
@@ -45,7 +46,7 @@ public class OrderDetailActivity extends AppCompatActivity implements Interfaces
     ProgressDialog nDialog;
     AlertDialog alert;
 
-    PrintBluetooth printBT = new PrintBluetooth();
+    PrintBluetooth printBluetooth = new PrintBluetooth();
 
     Context context = OrderDetailActivity.this;
 
@@ -107,44 +108,7 @@ public class OrderDetailActivity extends AppCompatActivity implements Interfaces
                 builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int ii) {
-                        try {
-
-                            String printData = "SIZE 75 mm,75 mm\nGAP 0 mm,0 mm\nCLS" +
-                                    "\nTEXT 20 mm,35 mm,\"2\",0,1.5 mm,1.5 mm,\"" + txtSipNo.getText().toString() + "\"";
-
-                            String cari = txtSipCari.getText().toString();
-                            int o = 22;
-                            int l = 90;
-                            for (int i = 0; i < ((cari.length() - 1) / o); i++) {
-                                printData += "\nTEXT 20 mm," + (l + (i * 40)) + " mm,\"2\",0,1.5 mm,1.4 mm,\"" + cari.substring((i * o), (((cari.length() - 1) - (i * o)) > o ? o : (cari.length() - 1))) + "\"";
-                            }
-
-                            printData += "\nTEXT 20 mm,360 mm,\"2\",0,1.8 mm,1.7 mm,\"" + "-" + "\"" +
-                                    "\nTEXT 20 mm,410 mm,\"2\",0,1.8 mm,1.7 mm,\"" + txtUserName.getText().toString() + "\"" +
-                                    "\nPRINT 1\nEND\n";
-
-                            printData = printData.replace("İ", "I");
-                            printData = printData.replace("ı", "i");
-                            printData = printData.replace("Ö", "O");
-                            printData = printData.replace("ö", "o");
-                            printData = printData.replace("Ü", "U");
-                            printData = printData.replace("ü", "u");
-                            printData = printData.replace("Ş", "S");
-                            printData = printData.replace("ş", "s");
-                            printData = printData.replace("Ç", "C");
-                            printData = printData.replace("ç", "c");
-
-                            PrintBluetooth.printer_id = GlobalVariable.printerName;
-                            // YAZMA BAŞLAR
-                            printBT.findBT();
-                            printBT.openBT();
-                            printBT.printOrderLabel(printData);
-                            printBT.closeBT();
-                            // YAZMA BİTER
-                        } catch (IOException e) {
-                            String error = e.getMessage();
-                            e.printStackTrace();
-                        }
+                        print();
                     }
                 });
                 builder.show();
@@ -186,10 +150,10 @@ public class OrderDetailActivity extends AppCompatActivity implements Interfaces
                             if (txtBarcode.getText().toString().contains("=")) {
                                 String[] value = txtBarcode.getText().toString().split("=");
 
-                                fnOrderPicking(value[1].toUpperCase(),1.0);
+                                fnOrderPicking(value[1].toUpperCase(), 1.0);
 
                             } else
-                                fnOrderPicking(txtBarcode.getText().toString(),1.0);
+                                fnOrderPicking(txtBarcode.getText().toString(), 1.0);
 
                         return true;
                     }
@@ -403,5 +367,24 @@ public class OrderDetailActivity extends AppCompatActivity implements Interfaces
             }
         });
         builder.show();
+    }
+
+    void print() {
+        try {
+            Toast.makeText(context, "Etiket", Toast.LENGTH_LONG).show();
+
+           /* PrintBluetooth.printer_id = GlobalVariable.printerName;
+
+            printBluetooth.findBT();
+            printBluetooth.openBT();
+            printBluetooth.printOrderLabel(new OrderPrintLabelDto(
+                    GlobalVariable.getSelectedOrder().getSipNo(),
+                    GlobalVariable.getSelectedOrder().getCari(),
+                    GlobalVariable.getSelectedOrder().getTarih()
+            ));
+            printBluetooth.closeBT();*/
+        } catch (Exception e) {
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }

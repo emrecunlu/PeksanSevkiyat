@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,21 +13,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Label.ShippingPrintLabelDto;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Label.ZarfLabel;
 import com.replik.peksansevkiyat.DataClass.ModelDto.Label.ZarfProducts;
-import com.replik.peksansevkiyat.DataClass.ModelDto.TSPL.WidtHeight;
+import com.replik.peksansevkiyat.DataClass.ModelDto.OrderDetail.OrderPrintLabelDto;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 
 public class PrintBluetooth extends AppCompatActivity {
 
@@ -114,6 +110,14 @@ public class PrintBluetooth extends AppCompatActivity {
                     "\nPRINT 1\nEND\n";
             mmOutputStream.write(toTurkish(printData).getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void printOrderLabel(OrderPrintLabelDto orderPrintLabelDto) {
+        try {
+
+        }catch (Exception e) {
             e.printStackTrace();
         }
     }
